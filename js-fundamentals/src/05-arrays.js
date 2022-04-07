@@ -124,10 +124,27 @@ exports.count = function(arr, item) {
  */
 exports.duplicates = function(arr) {
 
-  var results = arr.filter((item, index) => arr.indexOf(item) !== index);
+    
+    var duplicates = [];
+    //console.log("This is the empty array: " + duplicates);
 
-  return results;
+    var tempArray = arr.sort();
+    //console.log("This is the sorted array :" + tempArray)
 
+    for (let i = 0; i < tempArray.length; i++) {
+        
+        //console.log("Inside Loop cycle n: " + i)
+
+        if (tempArray[i+1] === tempArray[i] && tempArray[i] !== tempArray[i-1]){
+
+            //console.log("Next item is a duplicate: " + tempArray[i+1])
+            duplicates.push(tempArray[i])
+        }
+        
+    }
+
+    //console.log("This is my final Array :" + duplicates)
+    return duplicates;
 };
 
 /**
@@ -144,6 +161,21 @@ exports.square = function(arr) {
  */
 exports.findAllOccurrences = function(arr, target) {
 
+    
+    var indexes = [];
 
+    for (let i = 0; i < arr.length; i++) {
+        
+        //console.log("This is index nº :" + i)
+
+        if(arr[i] === target){
+
+            //console.log("found a "+ target + "element in index " + i);
+            indexes.push(i);
+        }       
+    }
+
+    //console.log(indexes);
+    return indexes;
 
 };
