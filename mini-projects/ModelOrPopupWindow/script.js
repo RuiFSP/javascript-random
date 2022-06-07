@@ -8,6 +8,7 @@ openModal.addEventListener("click", function () {
   blurBg.classList.remove("hidden-blur");
 });
 
+//todo - fix to revert to initial state
 closeModal.addEventListener("click", function() {
   modalContent.getElementsByClassName.display = "none";
 })
