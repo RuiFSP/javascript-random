@@ -1,8 +1,39 @@
 'use strict';
 
-// Data needed for a later exercise
-const flights =
-  '_Delayed_Departure;fao93766109;txl2133758440;11:25+_Arrival;bru0943384722;fao93766109;11:45+_Delayed_Arrival;hel7439299980;fao93766109;12:05+_Departure;fao93766109;lis2323639855;12:30';
+// // Data needed for a later exercise
+// const flights =
+//   '_Delayed_Departure;fao93766109;txl2133758440;11:25+_Arrival;bru0943384722;fao93766109;11:45+_Delayed_Arrival;hel7439299980;fao93766109;12:05+_Departure;fao93766109;lis2323639855;12:30';
+
+const weekdays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+const openingHours = {
+  //old way
+  // thu: {
+  //   open: 12,
+  //   close: 22,
+  // },
+
+  //computed with ES6
+  // [weekdays[3]]: {
+  //   open: 12,
+  //   close: 22,
+  // },
+
+  //we can even use template literals
+  [weekdays[`${1 + 2}`]]: {
+    open: 12,
+    close: 22,
+  },
+
+  fri: {
+    open: 11,
+    close: 23,
+  },
+  sat: {
+    open: 0, // Open 24 hours
+    close: 24,
+  },
+};
 
 // Data needed for first part of the section
 const restaurant = {
@@ -16,20 +47,26 @@ const restaurant = {
     return [this.starterMenu[startedIndex], this.mainMenu[mainIndex]];
   },
 
-  openingHours: {
-    thu: {
-      open: 12,
-      close: 22,
-    },
-    fri: {
-      open: 11,
-      close: 23,
-    },
-    sat: {
-      open: 0, // Open 24 hours
-      close: 24,
-    },
-  },
+  //prior to ES6
+  //openingHours: openingHours,
+
+  //ES6 enchanced object literals
+  openingHours,
+
+  // openingHours: {
+  //   thu: {
+  //     open: 12,
+  //     close: 22,
+  //   },
+  //   fri: {
+  //     open: 11,
+  //     close: 23,
+  //   },
+  //   sat: {
+  //     open: 0, // Open 24 hours
+  //     close: 24,
+  //   },
+  // },
 
   // orderDelivery: function (obj) {
   //   console.log(obj);
@@ -46,7 +83,13 @@ const restaurant = {
     );
   },
 
-  orderPasta: function (ing1, ing2, ing3) {
+  //old way of representing
+  // orderPasta: function (ing1, ing2, ing3) {
+  //   console.log(`Here is your delicious pasta with ${ing1} ${ing2} ${ing3}`);
+  // },
+
+  //ES6 representation
+  orderPasta(ing1, ing2, ing3) {
     console.log(`Here is your delicious pasta with ${ing1} ${ing2} ${ing3}`);
   },
 
@@ -56,7 +99,151 @@ const restaurant = {
   },
 };
 
-// - Logical Assignment Operators introduced in ES2021
+//looping Objects: obeject keys, values and entries
+
+//property NAMES - keys
+const properties = Object.keys(openingHours);
+console.log(properties); //it is an array
+
+let openStr = `we are open on ${properties.length} days:`;
+
+for (const day of properties) openStr += `${day}, `;
+
+console.log(openStr);
+
+//property VALUES
+const values = Object.values(openingHours);
+console.log(values); //array de objectos
+
+//Entries on objects - Key + value
+const entries = Object.entries(openingHours);
+console.log(entries);
+
+//[key,value] but the value is destructured for open and close
+for (const [key, { open, close }] of entries) {
+  console.log(`On ${key} we open at ${open} and close at ${close}`);
+}
+
+/* // -------- Optional Chaining (?.)
+
+//------Properties
+//onsole.log(restaurant.openingHours.mon); //undefined
+//console.log(restaurant.openingHours.mon.open); //error
+
+//we need to check first if property exists many with an if ??
+
+//if (restaurant.openingHours.fri) console.log(restaurant.openingHours.fri.open); //11 just to check it works
+
+if (restaurant.openingHours && restaurant.openingHours.mon)
+  console.log(restaurant.openingHours.mon.open);
+
+// console.log(restaurant.openingHours.mon.open); //this will produce an error
+
+//WITH Optional chaining
+console.log(restaurant.openingHours.mon?.open); //undefined - only if the property at the left of ? exist will return a value, else is undifined and not an error
+console.log(restaurant.openingHours?.mon?.open); // undefined asking two questions
+console.log(restaurant.openingHours.fri?.open); //11
+console.log(restaurant.openingHours.sat?.close); //24
+
+const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+for (const day of days) {
+  console.log(day);
+  //const open = restaurant.openingHours[day]?.open || 'closed'; //day comes dinamically from array with a default and gives a problem at sat because of 0
+  const open = restaurant.openingHours[day]?.open ?? 'closed'; //solution and nullish coaalishng operator
+  console.log(`On ${day}, we open at ${open}`); //shows what days is open and exist, the ones that don~t exist are showned as undifined
+}
+
+//------Methods - check if method exist before calling it
+console.log(restaurant.order?.(0, 1) ?? 'Method does not exist'); //['Focaccia', 'Pasta']
+console.log(restaurant.orderrisotto?.(0, 1) ?? 'Method does not exist'); //method does not exist
+
+//- also works with ARRAYS
+
+const users = [{ name: 'jonas', email: 'hello2jons.com' }];
+
+//old way
+if (users.length > 0) console.log(users[0].name);
+else console.log('user array empty');
+
+//new syntax
+console.log(users[0]?.name ?? 'User array empty'); */
+
+//--------------------------- Enhanced Object Literals
+
+//3 ways to represent bject literals in ES6
+
+//----------1) we don´t have to repeat property name with the same name of variable
+
+//if we wanted to incorporate new property object to restaurant
+
+//prior to ES6
+//openingHours: openingHours,
+
+//ES6 enchanced object literals
+// openingHours, console.log(restaurant);
+
+//---------2) we don´t have to repeat function name with for methos
+
+//old way of representing
+// orderPasta: function (ing1, ing2, ing3) {
+//   console.log(`Here is your delicious pasta with ${ing1} ${ing2} ${ing3}`);
+// },
+
+//ES6 representation
+// orderPasta(ing1, ing2, ing3) {
+//   console.log(`Here is your delicious pasta with ${ing1} ${ing2} ${ing3}`);
+// },
+
+//----------3) now we can compute property names
+
+//Before we can only compute the value and now the roperty names, but is possible now with ES6
+
+//const weekdays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+//old way
+// thu: {
+//   open: 12,
+//   close: 22,
+// },
+
+//computed with ES6
+// [weekdays[3]]: {
+//   open: 12,
+//   close: 22,
+// },
+
+//we can even use template literals
+// [weekdays[`${1 + 2}`]]: {
+//   open: 12,
+//   close: 22,
+// },
+
+//------------------------------- Looping Arrays : The for-of Loopp
+
+// const menu = [...restaurant.starterMenu, ...restaurant.mainMenu];
+
+// // for (const item of menu) console.log(item); //shows each item from menu array
+
+// //we can still use continue and break for this loop
+
+// //disavantages - harder to get index
+// // for (const item of menu.entries()) {
+// //   console.log(item);
+// //   console.log(`${item[0] + 1}: ${item[1]}`);
+// // }
+
+// // console.log(menu.entries()); //array iterator
+// // console.log(...menu.entries()); //expand the array iterator each position contatis a new array with index and the element of the menu
+
+// //smarter away we can use destructuring, since item is an array [i,el]
+// for (const [i, el] of menu.entries()) {
+//   // console.log(item);
+//   console.log(`${i + 1}: ${el}`);
+//   //smarter away we can use destructuring, since item is an array [i,el]
+// }
+
+/* // ------------------------------- Logical Assignment Operators introduced in ES2021
 
 const rest1 = {
   name: 'Capri',
@@ -68,7 +255,7 @@ const rest2 = {
   name: 'La Piazza',
   owner: 'Giovanni Rossi',
 };
-
+ */
 //set the a default value for numGuests for all restaurants
 // OR assignment operator
 // rest1.numGuests = rest1.numGuests || 10; //short-circuiting
