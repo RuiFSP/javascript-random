@@ -28,7 +28,7 @@ const capitalizeName = (name) => {
 console.log(capitalizeName("pedro maduro jorge")); //Pedro Maduro Jorge
 console.log(capitalizeName("rui pinto")); //Rui Pinto
 
-//Padding a string - add number a caracter to te string - padStart(), padend()
+//Padding a string - add number a caracter to the string - padStart(), padend()
 
 const message = "Go to gate 23!";
 console.log(message.padStart(25, "+")); //+++++++++++Go to gate 23!
