@@ -134,14 +134,14 @@ function count() {
 }
 
 //SUMMARY
-//first class function is just a concept and says functiosn are simply values
+//first class function is just a concept and says functions are simply values
 //higher order-function exist */
 
 //-------------------------------------------------------------------------------------------
 //---------------------- FUNCTIONS ACCEPTING CALL BACK FUNCTIONS ----------------------------
 //-------------------------------------------------------------------------------------------
 
-//create a string without any spaces
+/* //create a string without any spaces
 const oneWord = function (str) {
   return str.replace(/ /g, ' ').toLowerCase();
 };
@@ -157,7 +157,7 @@ const upperFirstWord = function (str) {
 const transformer = function (str, fn) {
   console.log(`Original string: ${str}`);
   console.log(`Transformed sstring: ${fn(str)}`);
-  console.log(`Transformer by: ${fn.name}`);
+  console.log(`Transformer by: ${fn.name}`); //gives the name of function - native function
 };
 
 transformer('JavaScript is the best!', upperFirstWord);
@@ -170,4 +170,8 @@ const high5 = function () {
 
 document.body.addEventListener('click', high5);
 
-['rui', 'pedro', 'ana'].forEach(high5); //3 wavings
+['rui', 'pedro', 'ana'].forEach(high5); //3 wavings */
+
+//-------------------------------------------------------------------------------------------
+//--------------------------- FUNCTIONS RETURNING FUNCTIONS ---------------------------------
+//-------------------------------------------------------------------------------------------
