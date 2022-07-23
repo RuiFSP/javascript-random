@@ -202,7 +202,7 @@ greet1('Welcome')('Rui'); */
 //--------------------------- 6) The CALL, APPLY, BIND Methods ------------------------------
 //-------------------------------------------------------------------------------------------
 
-const lufthansa = {
+/* const lufthansa = {
   airline: ' Luthansa',
   iataCode: 'LM',
   bookings: [],
@@ -325,4 +325,46 @@ const addTaxRate = function (rate) {
 const addVAT2 = addTaxRate(0.23);
 console.log(addVAT2(100));
 console.log(addVAT2(23));
-//same results as above //123 and 28.29
+//same results as above //123 and 28.29 */
+
+//-------------------------------------------------------------------------------------------
+//------------- 7) Immediately Invoked Function Expression (IIFE) ---------------------------
+//-------------------------------------------------------------------------------------------
+
+/* //Sometimes we need a function that disappears after called once !!
+//How can we do that ? we can create a function and execute it once
+
+const runOnce = function () {
+  console.log('This will never run again');
+};
+
+//runOnce();
+
+//but later we can do runOnce() again !!
+//This is not it, we want to run a function immediately and not save it somewhere
+
+//we wrap the function with parenthesis () add execute it immediately like we normally do with () -> something like (function(){})()
+//example -  IIFE - immediately invoked function expression
+(function () {
+  const isPrivate = 23;
+  console.log('function value: This will never run again ');
+})();
+
+//similar to arrow function (() => something...)()
+(() => console.log('arrow expression This will never run again'))();
+
+//functions create scopes and we don´t have access to variables inside of them
+//console.log(isPrivate); isPrivate not defined
+// we also say that this data is private or encapsulated
+// It is important to hide variables and scopes to protect variables and IIFE was invented because of it
+//let and const create a block scope and this is why we do not use var anymore
+{
+  const isPrivate = 23;
+  var notPrivate = 24;
+}
+console.log(notPrivate);
+//In modern javascript we don´t use IIFE anymore, because we can simply create a block to hide it, unless we really need to run something that runs only once */
+
+//-------------------------------------------------------------------------------------------
+//-------------------------------- 8) Closures ----------------------------------------------
+//-------------------------------------------------------------------------------------------
