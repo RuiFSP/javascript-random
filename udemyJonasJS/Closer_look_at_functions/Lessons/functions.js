@@ -368,3 +368,81 @@ console.log(notPrivate);
 //-------------------------------------------------------------------------------------------
 //-------------------------------- 8) Closures ----------------------------------------------
 //-------------------------------------------------------------------------------------------
+
+//IMPORTANT
+//for some is hardest concept to understand in js - closure. It is a feature that is used all the time, even without us realizing
+
+/* //we don´t create closure manually, it happens automatically in some situations
+const secureBooking = function () {
+  let passengerCount = 0;
+
+  //we just update the variable in the parent function
+  return function () {
+    passengerCount++;
+    console.log(`${passengerCount} passengers`);
+  };
+};
+
+const booker = secureBooking();
+
+booker();
+booker();
+booker();
+
+//closure remembers all the variables created at the birthplace by the time it was created
+console.dir(booker); //we can see closure the [[scope]], the double bracket means we can´t access it from our code */
+
+//1) practice examples to identify closures - reassign function without returning them
+let f;
+
+const g = function () {
+  const a = 23;
+  f = function () {
+    console.log(a * 2);
+  };
+};
+
+const h = function () {
+  const b = 777;
+  f = function () {
+    console.log(b * 2);
+  };
+};
+
+g();
+//g is no longer in the execution context
+f(); //j can still have access to g function, even after his execution - closure in practice
+
+console.dir(f); //closure does have the value of b [[Scope]] - 0: a: 23
+
+//re-assigning f function
+h();
+f();
+
+console.dir(f); //closure does have the value of b [[Scope]] - 0: b: 777
+
+//A closure makes sure a variable does not lose it's connection with the variables at their birthplace
+
+//2) practice example - timer
+const boardPassengers = function (n, wait) {
+  const perGroup = n / 3;
+
+  setTimeout(function () {
+    console.log(`we are now boarding all ${n} passengers`);
+    console.log(`There are 3 groups, each with ${perGroup} passengers`);
+  }, wait * 1000);
+
+  console.log(`Will start boarding in ${wait} seconds`);
+};
+
+//let's prove closure as priority over the scope chain
+const perGroup = 1000; //it will not use 1000, but 60 as perGroup , because of Closure.
+
+boardPassengers(180, 3);
+//This will immediately be created "Will start boarding in 3 seconds"
+//waits 3 seconds and then prints the rest
+// 3
+// 2
+// 1
+//we are now boarding all 180 passengers
+//There are 3 groups, each with 60 passengers
