@@ -67,7 +67,7 @@ const displayMovements = function (movements) {
   containerMovements.innerHTML = '';
   //we used to do .textContext = ""
 
-  //gos through the array of each account and outputs their movements
+  //goes through the array of each account and outputs their movements
   movements.forEach(function (mov, i) {
     //checking if it is a deposit or withdrawal
     const type = mov > 0 ? 'deposit' : 'withdrawal';
@@ -86,8 +86,27 @@ const displayMovements = function (movements) {
     containerMovements.insertAdjacentHTML('afterbegin', html); //with 'beforeend' the order will be inverted
   });
 };
-
 displayMovements(account1.movements);
+
+const calcDisplayBalance = function (movements) {
+  const balance = movements.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = `${balance} €`;
+};
+calcDisplayBalance(account1.movements);
+
+//Computing Usernames
+const createUserNames = accs =>
+  accs.forEach(acc => {
+    //to produce a side effect without returning anything adding a new property (mutate)
+    acc.userName = acc.owner
+      .toLowerCase()
+      .split(' ')
+      .map(user => user[0]) //new array
+      .join('');
+  });
+
+createUserNames(accounts); //new property userName with the shortName version
+//console.log(...accounts);
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
@@ -270,3 +289,89 @@ currenciesUnique.forEach(function (value, _, set) {
   //console.log(`${key} : ${value}`);
   console.log(`${value} : ${value}`);
 }); */
+
+//-------------------------------------------------------------------------------------------
+//-------------Data Transformation with map(), filter(), reduce() ---------------------------
+//-------------------------------------------------------------------------------------------
+
+//---------------------map method()
+//map returns a NEW ARRAY containing the results of applying an operation on all array elements
+/* const movements = [200, 450, -400, 3000, -650, -130, 70, 1300]; //suppose they are in euros
+//we want to convert it to dollars
+
+const eurToUsd = 1.1;
+
+//this is not mutates the original array
+//functional programming - modern way of doing stuff
+//concise way - arrow function
+const movementsUsd = movements.map(mov => mov * eurToUsd);
+
+//for of loop - more work than map method();
+const movementsUsdFor = [];
+for (const mov of movements) {
+  movementsUsdFor.push(mov * eurToUsd);
+}
+
+console.log(movementsUsd);
+console.log(movementsUsdFor);
+
+//nice and clean
+const movementsDescriptions = movements.map(
+  (mov, i) =>
+    `Movement ${i + 1}: You ${mov > 0 ? 'deposited' : 'withdrew'} ${Math.abs(
+      mov
+    )}`
+);
+
+console.log(movementsDescriptions); */
+
+//---------------------filter method()
+//filter returns a NEW ARRAY containing the array elements that passed a specified test condition
+/* const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+const deposits = movements.filter(mov => mov > 0);
+
+console.log(movements);
+console.log(deposits);
+
+//for of alternative
+const depositsFor = [];
+for (const mov of movements) if (mov > 0) depositsFor.push(mov);
+console.log(depositsFor);
+
+//mine challenge
+const withdrawals = movements.filter(mov => mov < 0);
+console.log(withdrawals); */
+//---------------------reduce method()
+//there is no new array, just the reduced value
+//reduce boils ("reduces") all the array elements down to a single value (e.g adding all elements together) - called "snowball effect"
+const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+
+//accumulator is like a snowball
+/* const balance = movements.reduce(function (acc, curr, i, arr) {
+  console.log(`Iteration ${i} : ${acc}`);
+  return acc + curr;
+}, 100); //default value is 100 - Iteration 0 will be 100 */
+
+//short version
+/* const balance = movements.reduce((acc, curr, i, arr) => acc + curr, 0);
+
+console.log(balance); */
+
+//for loop
+/* console.log('---- "for...of" alternative ----');
+let balanceOf = 100;
+for (const [i, mov] of movements.entries()) {
+  console.log(`Iteration ${i} : ${balanceOf}`);
+  balanceOf += mov;
+}
+console.log(balanceOf); */
+
+// Maximum value of movement array using reduce()
+
+const maxMovementValue = movements.reduce((acc, mov) =>
+  acc > mov ? acc : mov
+); //by default he will pick the first element
+
+console.log(maxMovementValue);
+
+//console.log(Math.max(maxMovementValue));
