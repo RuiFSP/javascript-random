@@ -11,21 +11,18 @@ const account1 = {
   interestRate: 1.2, // %
   pin: 1111,
 };
-
 const account2 = {
   owner: 'Jessica Davis',
   movements: [5000, 3400, -150, -790, -3210, -1000, 8500, -30],
   interestRate: 1.5,
   pin: 2222,
 };
-
 const account3 = {
   owner: 'Steven Thomas Williams',
   movements: [200, -200, 340, -300, -20, 50, 400, -460],
   interestRate: 0.7,
   pin: 3333,
 };
-
 const account4 = {
   owner: 'Sarah Smith',
   movements: [430, 1000, 700, 50, 90],
@@ -78,7 +75,7 @@ const displayMovements = function (movements) {
       <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
-      <div class="movements__value">${mov}</div>
+      <div class="movements__value">${mov}€</div>
     </div>`;
 
     //inserts the html create by loop after parent class="movements"
@@ -86,14 +83,10 @@ const displayMovements = function (movements) {
     containerMovements.insertAdjacentHTML('afterbegin', html); //with 'beforeend' the order will be inverted
   });
 };
-displayMovements(account1.movements);
-
 const calcDisplayBalance = function (movements) {
   const balance = movements.reduce((acc, mov) => acc + mov, 0);
   labelBalance.textContent = `${balance} €`;
 };
-calcDisplayBalance(account1.movements);
-
 //Computing Usernames
 const createUserNames = accs =>
   accs.forEach(acc => {
@@ -106,7 +99,66 @@ const createUserNames = accs =>
   });
 
 createUserNames(accounts); //new property userName with the shortName version
-//console.log(...accounts);
+
+//computing totals of deposits, withdraws and interest rate
+const calcDisplaySummary = function (acc) {
+  const incomes = acc.movements
+    .filter(mov => mov > 0)
+    .reduce((acc, mov) => acc + mov, 0);
+
+  labelSumIn.textContent = `${incomes}€`;
+
+  const outcomes = acc.movements
+    .filter(mov => mov < 0)
+    .reduce((acc, mov) => acc + mov, 0);
+
+  labelSumOut.textContent = `${Math.abs(outcomes)}€`;
+
+  const interest = acc.movements
+    .filter(mov => mov > 0)
+    .map(deposit => (deposit * acc.interestRate) / 100)
+    .filter((int, _, arr) => {
+      //console.log(arr);
+      return int >= 1;
+    }) //only pays interest > =1
+    .reduce((acc, int) => acc + int, 0);
+
+  labelSumInterest.textContent = `${interest}€`;
+};
+
+//Event handlers
+let currentAccount; //we need to have current account
+
+btnLogin.addEventListener('click', function (e) {
+  e.preventDefault(); //prevents the page to reload, because form submits immediately
+  //Enter will also trigger a click event
+  //We need to save current account in a variable outside
+  //if does not find an account , it will return undefined
+  currentAccount = accounts.find(
+    acc => acc.userName === inputLoginUsername.value
+  );
+  //console.log(currentAccount); //value of an input field
+
+  //"optional chaining" is the solution for the undefined, avoids the error
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    //display UI and a message
+    labelWelcome.textContent = `Welcome Back, ${
+      currentAccount.owner.split(' ')[0]
+    }`;
+    containerApp.style.opacity = 100; //turn on display
+
+    //clear input fields
+    inputLoginUsername.value = inputLoginPin.value = '';
+    //clear focus of cursor
+    inputLoginPin.blur();
+    //display movements
+    displayMovements(currentAccount.movements);
+    //display balance
+    calcDisplayBalance(currentAccount.movements);
+    //display summary
+    calcDisplaySummary(currentAccount);
+  }
+});
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
@@ -344,7 +396,7 @@ console.log(withdrawals); */
 //---------------------reduce method()
 //there is no new array, just the reduced value
 //reduce boils ("reduces") all the array elements down to a single value (e.g adding all elements together) - called "snowball effect"
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+//const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 //accumulator is like a snowball
 /* const balance = movements.reduce(function (acc, curr, i, arr) {
@@ -368,10 +420,74 @@ console.log(balanceOf); */
 
 // Maximum value of movement array using reduce()
 
-const maxMovementValue = movements.reduce((acc, mov) =>
+/* const maxMovementValue = movements.reduce((acc, mov) =>
   acc > mov ? acc : mov
-); //by default he will pick the first element
+); //by default he will pick the first element */
 
-console.log(maxMovementValue);
+//console.log(maxMovementValue);
 
 //console.log(Math.max(maxMovementValue));
+
+//-------------------------------------------------------------------------------------------
+//------------------------------------Chaining Methods --------------------------------------
+//-------------------------------------------------------------------------------------------
+/* const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+const eurToUsd = 1.1;
+
+//chaining operations , first we filter the deposits -> transform to USD -> get total and sum all deposits
+//In method chaining, every operation needs to return an array - PIPELINE
+//makes it harder to debug
+
+const totalDepositsUSD = movements
+  .filter(mov => mov > 0)
+  .map(mov => mov * eurToUsd)
+  .reduce((acc, mov) => acc + mov, 0);
+
+//we can use the parameter arr to see the previous arr
+const totalDepositsUSD1 = movements
+  .filter((mov, _, arr) => {
+    console.log(`Array feeding filter is : ${arr}`); //debug filter
+    return mov > 0;
+  })
+  .map((mov, _, arr) => {
+    console.log(`Array feeding map is : ${arr}`); //debug map
+    return mov * eurToUsd;
+  })
+  .reduce((acc, mov, _, arr) => {
+    console.log(`Array feeding reduce is : ${arr}`); //debug reduce
+    return acc + mov;
+  }, 0);
+
+//console.log(totalDepositsUSD);
+console.log(totalDepositsUSD1); */
+
+//-------------------------------------------------------------------------------------------
+//---------------------------------------find() method --------------------------------------
+//-------------------------------------------------------------------------------------------
+//retrieve an element of an array based on a condition
+//the first element where the operation becomes true
+/* const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+
+const firstWithdrawal = movements.find(mov => mov < 0);
+
+console.log(movements);
+console.log(firstWithdrawal); //-40o is the first withdrawal
+
+//lets work with objects , because find can be really useful
+//because we can find in array an object based on some property
+console.log(accounts);
+
+const account = accounts.find(acc => acc.owner === 'Jessica Davis');
+console.log(account);
+//usually the goal of find is to find ONE element
+
+//lets see the difference with for of loop
+let obj = {};
+
+for (const account of accounts) {
+  if (account.owner === 'Jessica Davis') {
+    obj = account;
+  }
+}
+
+console.log(obj); */
