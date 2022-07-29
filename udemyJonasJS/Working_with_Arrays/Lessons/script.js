@@ -59,13 +59,16 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 //receives an array of movements (deposits and withdrawals)
-const displayMovements = function (movements) {
+const displayMovements = function (movements, sort = false) {
   //clear values in the html
   containerMovements.innerHTML = '';
   //we used to do .textContext = ""
 
+  //copy movements using slice and not spread operator, because we are in a chain
+  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
+
   //goes through the array of each account and outputs their movements
-  movements.forEach(function (mov, i) {
+  movs.forEach(function (mov, i) {
     //checking if it is a deposit or withdrawal
     const type = mov > 0 ? 'deposit' : 'withdrawal';
 
@@ -83,9 +86,9 @@ const displayMovements = function (movements) {
     containerMovements.insertAdjacentHTML('afterbegin', html); //with 'beforeend' the order will be inverted
   });
 };
-const calcDisplayBalance = function (movements) {
-  const balance = movements.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = `${balance} €`;
+const calcDisplayBalance = function (acc) {
+  acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = `${acc.balance} €`;
 };
 //Computing Usernames
 const createUserNames = accs =>
@@ -129,6 +132,16 @@ const calcDisplaySummary = function (acc) {
 //Event handlers
 let currentAccount; //we need to have current account
 
+//refactoring because we´ll need to refresh after each operation
+const updateUI = function (acc) {
+  //display movements
+  displayMovements(acc.movements);
+  //display balance
+  calcDisplayBalance(acc);
+  //display summary
+  calcDisplaySummary(acc);
+};
+
 btnLogin.addEventListener('click', function (e) {
   e.preventDefault(); //prevents the page to reload, because form submits immediately
   //Enter will also trigger a click event
@@ -151,13 +164,83 @@ btnLogin.addEventListener('click', function (e) {
     inputLoginUsername.value = inputLoginPin.value = '';
     //clear focus of cursor
     inputLoginPin.blur();
-    //display movements
-    displayMovements(currentAccount.movements);
-    //display balance
-    calcDisplayBalance(currentAccount.movements);
-    //display summary
-    calcDisplaySummary(currentAccount);
+
+    // UpdateUI
+    updateUI(currentAccount);
   }
+});
+
+btnTransfer.addEventListener('click', function (e) {
+  e.preventDefault(); //pretty common when working with forms
+  const amount = Number(inputTransferAmount.value);
+  const receiverAcc = accounts.find(
+    acc => acc.userName === inputTransferTo.value
+  );
+
+  //add a negative movement to sender and positive movement for receiver
+  //check if valid number (+) to send
+  //check if we have enough money to send
+  if (
+    amount > 0 &&
+    receiverAcc &&
+    currentAccount.balance >= amount &&
+    receiverAcc?.userName !== currentAccount.userName
+  ) {
+    //Doing the transfer
+    currentAccount.movements.push(-amount);
+    receiverAcc.movements.push(amount);
+    // UpdateUI
+    updateUI(currentAccount);
+  }
+  //cleaning inputs
+  inputTransferAmount.value = inputTransferTo.value = '';
+});
+
+btnLoan.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  const amount = Number(inputLoanAmount.value);
+
+  //some() method is perfect to test for something
+  if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
+    //Add movement
+    currentAccount.movements.push(amount);
+
+    //Update UI
+    updateUI(currentAccount);
+  }
+
+  inputLoanAmount.value = '';
+});
+
+//closing accounts
+btnClose.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  if (
+    inputCloseUsername.value === currentAccount.userName &&
+    Number(inputClosePin.value) === currentAccount.pin
+  ) {
+    const index = accounts.findIndex(
+      acc => acc.userName === currentAccount.userName
+    );
+
+    //Delete account -> splice will mutate the original array, this is what we want
+    accounts.splice(index, 1);
+    //Hide UI
+    containerApp.style.opacity = 0;
+  }
+  //clear fields
+  inputCloseUsername.value = inputClosePin.value = '';
+});
+
+//state variable to check if we are sorting or not
+let sorted = false;
+//sorting handler
+btnSort.addEventListener('click', function (e) {
+  e.preventDefault();
+  displayMovements(currentAccount.movements, !sorted);
+  sorted = !sorted; //changes between sorted and not sorted
 });
 
 /////////////////////////////////////////////////
@@ -491,3 +574,109 @@ for (const account of accounts) {
 }
 
 console.log(obj); */
+
+//-------------------------------------------------------------------------------------------
+//---------------------------------------some() and every()-----------------------------------
+//-------------------------------------------------------------------------------------------
+/* const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+
+console.log(movements);
+console.log(movements.includes(-130)); //can only test equality
+
+// ----------- SOME: METHOD
+//but if we want to test for some condition ?
+
+console.log(movements.some(mov => mov === -130)); //does not make much sense, easier with include
+
+const anyDeposits = movements.some((mov, i, arr) => mov > 500);
+console.log(anyDeposits);
+
+// ----------- EVERY: METHOD
+//similar to some(), but only returns true if the condition are true
+console.log(movements.every((mov, i, arr) => mov > 0)); //false -> not all movements are deposits
+console.log(account4.movements.every((mov, i, arr) => mov > 0)); // true -> movements are all deposits
+
+//Separate callback might be useful re reusability - DRY principle (Don't repeat yourself)
+const deposit = mov => mov > 0;
+console.log(movements.some(deposit)); //and now we can reuse the functions
+console.log(movements.every(deposit)); //and now we can reuse the functions
+console.log(movements.filter(deposit)); //and now we can reuse the functions */
+
+//-------------------------------------------------------------------------------------------
+//---------------------------------------flat() and flatMap()--------------------------------
+//-------------------------------------------------------------------------------------------
+
+//introduced in ES2019
+//lets suppose we have nested arrays
+/* const arr = [[1, 2, 3], [4, 5, 6], 7, 8];
+
+//one level
+//we removed the nested array and flattened the array
+console.log(arr.flat()); //[1, 2, 3, 4, 5, 6, 7, 8]
+
+//lets suppose we have a even deeper array
+const arrDeep = [
+  [[1, 2], 3],
+  [4, [5, 6], 7, 8],
+];
+console.log(arrDeep.flat()); //only goes one level deep
+console.log(arrDeep.flat(1)); //the default is 1 level
+console.log(arrDeep.flat(2)); //we can choose another to have the same result */
+
+//lets suppose we want to calculate the overall balance of all accounts
+/* const accountsMovements = accounts.map(acc => acc.movements);
+console.log(accountsMovements); //contains the arr of arr with all the movements
+const allMovements = accountsMovements.flat();
+console.log(allMovements);
+const overallBalance = allMovements.reduce((acc, mov) => acc + mov, 0);
+console.log(overallBalance); */
+
+//----------flat() --------
+//chaining is much better
+/* const overallBalance = accounts
+  .map(acc => acc.movements)
+  .flat()
+  .reduce((acc, mov) => acc + mov, 0);
+
+console.log(overallBalance);
+
+//pretty common operation to to map and flat - so they invented flapMat() , better for performance
+
+//----------flatMap() --------
+const overallBalance1 = accounts
+  .flatMap(acc => acc.movements) //just notice that if you need to got deeper than 1 level , you need to flat() + map() separately
+  .reduce((acc, mov) => acc + mov, 0);
+
+console.log(overallBalance1); //same result */
+
+//-------------------------------------------------------------------------------------------
+//---------------------------------------Sorting arrays--------------------------------------
+//-------------------------------------------------------------------------------------------
+
+/* const owners = ['Jonas', 'Zach', 'Adam', 'Martha'];
+
+//alphabet's
+console.log(owners.sort()); //
+console.log(owners); ////Correct sorting :mutates the original array */
+
+//Numbers
+/* const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+console.log(movements); */
+//console.log(movements.sort()); //Incorrect sorting: sort does the sort using strings
+//converts everything to strings and then sorts
+
+//this is why we need a compare function in sorting
+//return < 0, A,B keep order
+//return > 0 B,A switch order
+/* movements.sort((currentValue, nextValue) => {
+  if (currentValue > nextValue) return 1;
+  if (currentValue < nextValue) return -1;
+}); */
+
+/* //sort mutates original array we need to save 
+//concise way - sorting ascending way
+movements.sort((a, b) => a - b);
+console.log(movements);
+//concise way - sorting descending way
+movements.sort((a, b) => b - a);
+console.log(movements); */
